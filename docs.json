@@ -173,5 +173,13 @@
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
     "href": "https://dpos.isoc.ooo"
+  },
+  "navbar": {
+    "links": [
+      {
+        "type": "github",
+        "href": "https://github.com/isoc-labs/dp-os-upgrade-docs"
+      }
+    ]
   }
 }
