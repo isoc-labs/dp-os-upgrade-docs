@@ -1,0 +1,90 @@
+---
+title: "DP Offline Ubuntu Upgrade Guide"
+description: "Follow one ordered runbook to prepare the Mirror Server, upgrade DP nodes to Ubuntu 24.04, complete DP 6.6.0 bringup, and validate the system."
+---
+
+<div className="xdr-hero">
+  <p className="xdr-kicker">Stellar Cyber DP lifecycle</p>
+  <h1 className="xdr-hero-title">Upgrade DP infrastructure with a controlled, repeatable path.</h1>
+  <p className="xdr-hero-copy">
+    Prepare an offline Mirror Server, move supported DP nodes from Ubuntu 16.04 to 24.04, complete DP 6.6.0 Phase 2, and validate every gate before the next step.
+  </p>
+  <div className="xdr-hero-actions">
+    <a className="xdr-hero-primary" href="/runbook/work-plan">Start the work plan →</a>
+    <a className="xdr-hero-secondary" href="/getting-started/requirements">Check requirements</a>
+  </div>
+  <div className="xdr-signal-grid">
+    <div className="xdr-signal"><strong>Prepare</strong><span>Stage and validate release material before the maintenance window.</span></div>
+    <div className="xdr-signal"><strong>Upgrade</strong><span>Follow one ordered OS-hop and Phase 2 procedure with current commands.</span></div>
+    <div className="xdr-signal"><strong>Validate</strong><span>Use explicit readiness, health, and recovery gates before closure.</span></div>
+  </div>
+</div>
+
+<Tip>
+**First time here?** Start with **[1. Upgrade Work Plan](/runbook/work-plan)**, then follow the numbered pages in the left navigation from top to bottom.
+</Tip>
+
+## The complete flow
+
+```text
+Plan the work
+  → Build / verify Ubuntu 24.04 Mirror Server
+  → Prepare upgrade files and reach READINESS = PASS
+  → DP Ubuntu 16.04 → 18.04 → 20.04 → 22.04 → 24.04
+  → DP 6.6.0 Phase 2 bringup
+  → Final validation and approved snapshot cleanup
+```
+
+The Mirror Server downloads and validates the required files in advance. During the production upgrade, DP hosts retrieve prepared material from that server over **HTTP/TCP 80**.
+
+## Follow these five steps
+
+<Columns cols={2}>
+  <Card title="1. Upgrade Work Plan" icon="clipboard-check" href="/runbook/work-plan">
+    Confirm the upgrade path, maintenance sequence, snapshots, cluster order, and go/no-go gates before touching any DP.
+  </Card>
+  <Card title="2. Ubuntu 24.04 Server Installation" icon="server" href="/runbook/ubuntu-24-04-server-installation">
+    Build the Mirror Server when a new server is required, then verify disk, network, and SSH access.
+  </Card>
+  <Card title="3. Mirror Server Setup" icon="download" href="/runbook/mirror-server-setup">
+    Install Mirror Manager, prepare the files, enable HTTP distribution, and reach **Upgrade Readiness = PASS**.
+  </Card>
+  <Card title="4. DP Offline Ubuntu Upgrade" icon="arrow-up-circle" href="/runbook/offline-dp-upgrade">
+    Use fresh Menu 7 commands for every OS hop and for DP 6.6.0 Phase 2 bringup.
+  </Card>
+  <Card title="5. Post-Upgrade Validation" icon="circle-check" href="/runbook/post-upgrade-validation">
+    Verify Ubuntu, DP version, DL/DA readiness, services, NTP/DNS, application health, and recovery-snapshot cleanup criteria.
+  </Card>
+</Columns>
+
+<Warning>
+Do not begin DP-side work until the current Mirror Server configuration reports **Upgrade Readiness = PASS** and fresh Menu 7 commands have been generated.
+</Warning>
+
+## Overall work plan
+
+The following example shows the complete flow for a **3-node DL cluster + 3-node DA cluster**. Smaller deployments follow the same stage order; use the current Menu 7 output for the exact commands and node-specific procedure.
+
+<Frame caption="Example end-to-end maintenance flow for a 6-node DP deployment">
+  <img src="/images/google-sites/01-work-plan/1.png" alt="DP Ubuntu 24.04 offline upgrade work plan" />
+</Frame>
+
+## Which path applies to my DP?
+
+| Current state | Use | Result |
+| --- | --- | --- |
+| Supported DP 6.2.x–6.5.0 on Ubuntu 16.04 | **Full OS Upgrade + Phase 2** | Ubuntu 24.04 + DP 6.6.0 |
+| Supported DP 6.2–6.5 already on Ubuntu 24.04 | **Phase 2 Only** | DP 6.6.0 |
+| Healthy DP 6.6.0 on Ubuntu 24.04 | Normally no upgrade | No change |
+
+The current Mirror Manager target is **DP 6.6.0**. Historical screenshots or recordings may show 6.5.0; do not copy those release-specific commands into the active workflow.
+
+## Three rules to remember
+
+1. **Prepare first.** Complete the Mirror Server work before the production maintenance window whenever possible.
+2. **Use freshly generated commands.** Run Menu 7 and use the commands it generates for the current Mirror Server IP, mode, and cluster configuration.
+3. **Keep recovery available.** Create the required hypervisor snapshot(s), follow any additional powered-off snapshot gate printed by the current upgrade client, and keep recovery points until final validation and change-control closure.
+
+## If something does not match the guide
+
+Use **[Troubleshooting](/operations/troubleshooting)** for the failed layer, **[Retry & Recovery](/operations/retry-recovery)** for interrupted operations or Phase 1 state, and **[Video Guides](/video-guides)** for supplemental visual references. Lower-level implementation material is separated into the **Reference** tab so the numbered runbook remains the primary operator path.

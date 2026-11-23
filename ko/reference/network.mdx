@@ -1,0 +1,45 @@
+---
+title: "네트워크 참고"
+description: "현재 업그레이드 절차에 필요한 미러 서버와 DP 간 네트워크 연결 조건을 정리합니다."
+---
+
+# 네트워크 참고
+
+## 데이터 경로
+
+```text
+Cloudflare R2 ─────┐
+                   ├── HTTPS ──> Mirror Server ── HTTP/TCP 80 ──> DP Host
+ACPS ──────────────┘
+```
+
+## 미러 서버 외부 연결
+
+미러 서버에서는 다음 외부 연결이 필요합니다.
+
+| 대상 | 목적 |
+| --- | --- |
+| GitHub 접속 | 최초 Clone 및 필요할 때 소스 업데이트 |
+| `https://xdrsolutions.uk` | Full Mode에 필요한 Cloudflare R2 OS 핵심 패키지 |
+| ACPS Endpoint | DP 6.6.0 Phase 2 파일 |
+| Ubuntu 패키지 저장소 | 미러 서버 초기 구성 및 패키지 설치 |
+
+## DP 호스트
+
+현재 오프라인/미러 방식에서 DP 호스트가 접근해야 하는 경로는 다음뿐입니다.
+
+```text
+TCP 80 -> <MIRROR_SERVER_IP>
+```
+
+DP 호스트는 Cloudflare R2 또는 ACPS에 직접 접근할 필요가 없습니다.
+
+클러스터 구성에서는 최종 적용을 위해 기존 DP 간 통신과 Master-to-Worker SSH 경로도 필요합니다.
+
+## IP 변경
+
+미러 서버 IP는 생성되는 클라이언트 파일에 포함됩니다. IP를 변경했다면 Menu 7을 사용하기 전에 설정을 갱신하고 클라이언트 파일을 다시 생성·배포·검증하십시오.
+
+## 과거 절차와의 차이
+
+과거 가이드에는 Canonical에 직접 접속하는 방식, TCP 3142의 `apt-cacher-ng`, 전체 `apt-mirror` 서버 구성이 포함되어 있습니다. 현재 Mirror Manager는 이 방식을 사용하지 않습니다.

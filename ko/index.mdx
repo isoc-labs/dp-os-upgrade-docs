@@ -1,0 +1,81 @@
+---
+title: "DP 오프라인 Ubuntu 업그레이드 가이드"
+description: "미러 서버 준비부터 DP의 Ubuntu 24.04 업그레이드, DP 6.6.0 적용, 최종 검증까지 순서대로 안내합니다."
+---
+
+<div className="xdr-hero">
+  <p className="xdr-kicker">Stellar Cyber DP lifecycle</p>
+  <h1 className="xdr-hero-title">DP 업그레이드를 통제된 하나의 절차로.</h1>
+  <p className="xdr-hero-copy">
+    오프라인 Mirror Server 준비부터 Ubuntu 16.04 → 24.04 업그레이드, DP 6.6.0 Phase 2, 최종 검증까지 각 단계의 PASS 조건을 확인하며 진행합니다.
+  </p>
+  <div className="xdr-hero-actions">
+    <a className="xdr-hero-primary" href="/ko/runbook/work-plan">업그레이드 작업 계획 시작 →</a>
+    <a className="xdr-hero-secondary" href="/ko/getting-started/requirements">요구사항 확인</a>
+  </div>
+  <div className="xdr-signal-grid">
+    <div className="xdr-signal"><strong>Prepare</strong><span>유지보수 전에 필요한 파일과 배포 준비 상태를 검증합니다.</span></div>
+    <div className="xdr-signal"><strong>Upgrade</strong><span>현재 생성된 명령으로 OS 단계와 Phase 2를 순서대로 진행합니다.</span></div>
+    <div className="xdr-signal"><strong>Validate</strong><span>Readiness, 상태, 복구 기준을 확인한 뒤 다음 단계로 이동합니다.</span></div>
+  </div>
+</div>
+
+## 이 가이드에서 수행하는 작업
+
+전체 업그레이드 경로는 다음과 같습니다.
+
+```text
+Mirror Server 준비
+  → DP Ubuntu 16.04
+  → 18.04
+  → 20.04
+  → 22.04
+  → 24.04
+  → DP 6.6.0 Phase 2
+  → 최종 검증
+```
+
+미러 서버는 필요한 파일을 미리 내려받아 검증합니다. 실제 업그레이드 중 DP는 **HTTP/TCP 80**을 통해 미러 서버에서 준비된 파일을 가져옵니다.
+
+## 아래 5단계만 순서대로 따라 하십시오
+
+| 단계 | 수행 작업 | 완료 조건 |
+| --- | --- | --- |
+| **1. 업그레이드 작업 계획** | 적용 경로, 작업 순서, 스냅샷, 진행/중단 조건 확인 | 작업 계획과 사전 조건 확인 완료 |
+| **2. Ubuntu 24.04 서버 설치** | 새 미러 서버가 필요할 때 Ubuntu 24.04 서버 구축 | OS, 디스크, 네트워크, SSH 확인 완료 |
+| **3. Mirror Server 설치 및 준비** | Mirror Manager 설치, 파일 준비, HTTP 배포, 준비 상태 확인 | **Upgrade Readiness = PASS** |
+| **4. DP 오프라인 Ubuntu 업그레이드** | Menu 7에서 생성된 최신 명령으로 각 OS 업그레이드와 Phase 2 수행 | Ubuntu 24.04 + DP 6.6.0 적용 완료 |
+| **5. 업그레이드 후 검증** | OS, DP 버전, 클러스터, 서비스, NTP/DNS, 운영 상태 확인 | 모든 필수 검증 항목 PASS |
+
+### 여기서 시작
+
+**[1단계 — 업그레이드 작업 계획 →](/ko/runbook/work-plan)**
+
+## 전체 작업 흐름
+
+아래 이미지는 3노드 DL 클러스터와 3노드 DA 클러스터를 예로 든 전체 작업 흐름입니다. 더 작은 구성도 같은 순서로 진행하며, 실제 명령과 노드별 절차는 현재 Mirror Manager가 생성한 Menu 7 출력을 사용하십시오.
+
+<img src="/images/google-sites/01-work-plan/1.png" alt="DP Ubuntu 24.04 오프라인 업그레이드 작업 계획" />
+
+## 내 DP에는 어떤 경로를 사용해야 하나요?
+
+| 현재 상태 | 사용 | 결과 |
+| --- | --- | --- |
+| Ubuntu 16.04의 지원 DP 6.2.x–6.5.0 | **Full OS Upgrade + Phase 2** | Ubuntu 24.04 + DP 6.6.0 |
+| 이미 Ubuntu 24.04인 지원 DP 6.2–6.5 | **Phase 2 Only** | DP 6.6.0 |
+| Ubuntu 24.04 + 정상 DP 6.6.0 | 일반적으로 업그레이드 불필요 | 변경 없음 |
+
+현재 Mirror Manager의 Phase 2 대상 버전은 **DP 6.6.0**입니다. 과거 6.5.0 절차를 현재 작업에 섞어 사용하지 마십시오.
+
+## 반드시 기억할 3가지
+
+1. **먼저 준비합니다.** 미러 서버에서 `Upgrade Readiness = PASS`를 확인하기 전에는 DP 작업을 시작하지 마십시오.
+2. **항상 최신 생성 명령을 사용합니다.** Menu 7에서 현재 미러 서버 IP, 준비 모드, 클러스터 설정에 맞는 명령을 생성합니다.
+3. **복구 수단을 유지합니다.** 파괴적 작업 전에 필요한 하이퍼바이저 스냅샷을 만들고 최종 검증과 변경 작업 종료 승인까지 유지하십시오.
+
+## 작업 중 문제가 발생하면
+
+- **[문제 해결](/ko/operations/troubleshooting)** — 실패 지점과 다음 안전 조치 확인
+- **[재시도 및 복구](/ko/operations/retry-recovery)** — 중단된 다운로드, Phase 1 상태, 스냅샷 복구
+- **[영상 가이드](/ko/video-guides)** — 화면 기준 보조 자료
+- 상세 구현 정보는 상단 **참고 자료** 탭에서 확인할 수 있습니다.
